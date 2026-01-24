@@ -68,6 +68,7 @@ export default function App() {
 
   const [currentStep, setCurrentStep] = useState<'input' | 'summary' | 'history'>('input');
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [saveForm, setSaveForm] = useState({ title: '', description: '' });
 
   const [form, setForm] = useState({
@@ -199,13 +200,22 @@ export default function App() {
             <h1 className="text-2xl font-black tracking-tight text-white">CargoWeigh</h1>
           </div>
           <div className="flex items-center gap-3">
-            {deferredPrompt && (
-              <button
-                onClick={handleInstallClick}
-                className="bg-sky-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-sky-500/20 active:scale-95 transition-all uppercase tracking-widest"
-              >
-                Install App
-              </button>
+            {!window.matchMedia('(display-mode: standalone)').matches && !(window.navigator as any).standalone && (
+              deferredPrompt ? (
+                <button
+                  onClick={handleInstallClick}
+                  className="bg-sky-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-sky-500/20 active:scale-95 transition-all uppercase tracking-widest"
+                >
+                  Install App
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowInstallGuide(true)}
+                  className="bg-white/10 text-white/60 text-[10px] font-black px-3 py-1.5 rounded-full border border-white/5 active:scale-95 transition-all uppercase tracking-widest"
+                >
+                  Install App
+                </button>
+              )
             )}
             <button
               onClick={clearAll}
@@ -494,6 +504,63 @@ export default function App() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Install Guide Modal */}
+      <AnimatePresence>
+        {showInstallGuide && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowInstallGuide(false)}
+              className="absolute inset-0 bg-black/95 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="w-full max-w-sm glass-card p-8 space-y-6 border-white/10 bg-[#0a0a0a] relative z-10"
+            >
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-black text-white tracking-tight">INSTALL APP</h2>
+                <button onClick={() => setShowInstallGuide(false)} className="text-white/20 hover:text-white">
+                  <X />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black text-sky-400 uppercase tracking-[0.2em]">For iPhone (iOS)</p>
+                  <ol className="text-sm text-white/60 space-y-2 list-decimal ml-4 font-bold">
+                    <li>Tap the <span className="text-white">Share</span> button (square icon with arrow)</li>
+                    <li>Scroll down and tap <span className="text-white">"Add to Home Screen"</span></li>
+                    <li>Tap <span className="text-white">Add</span> in the top right</li>
+                  </ol>
+                </div>
+
+                <div className="w-full h-[1px] bg-white/5" />
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">For Android / Chrome</p>
+                  <ol className="text-sm text-white/60 space-y-2 list-decimal ml-4 font-bold">
+                    <li>Tap the <span className="text-white">three dots (⋮)</span> in the top right corner</li>
+                    <li>Tap <span className="text-white">"Install App"</span> or <span className="text-white">"Add to Home Screen"</span></li>
+                    <li>Confirm by tapping <span className="text-white">Install</span></li>
+                  </ol>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowInstallGuide(false)}
+                className="w-full bg-white/10 text-white font-black py-4 rounded-2xl border border-white/5 active:scale-[0.98] transition-all uppercase tracking-widest text-sm"
+              >
+                GOT IT
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Save Modal */}
       <AnimatePresence>
