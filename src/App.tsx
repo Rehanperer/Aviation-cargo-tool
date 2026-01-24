@@ -89,7 +89,6 @@ export default function App() {
   const addEntry = () => {
     if (entries.length >= 12) return alert('Maximum 12 entries reached');
     if (!form.reference || !form.pieces || !form.avgWeight) return alert('Please fill all fields');
-    if (form.reference.length !== 6) return alert('Reference must be 6 digits');
 
     const newEntry: CargoEntry = {
       id: crypto.randomUUID(),
@@ -211,7 +210,7 @@ export default function App() {
               <div className="glass-card p-6 space-y-4 border-white/5 bg-white/[0.02]">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] ml-1">Compartment</label>
+                    <label>Compartment</label>
                     <select
                       value={form.compartment}
                       onChange={e => setForm({ ...form, compartment: Number(e.target.value) })}
@@ -224,12 +223,12 @@ export default function App() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] ml-1">Ref ID (6 Digits)</label>
+                    <label>Reference ID</label>
                     <input
-                      type="number"
-                      placeholder="000000"
+                      type="text"
+                      placeholder="Enter ID"
                       value={form.reference}
-                      onChange={e => setForm({ ...form, reference: e.target.value.slice(0, 6) })}
+                      onChange={e => setForm({ ...form, reference: e.target.value })}
                       className="input-field bg-black/40 border-white/5"
                     />
                   </div>
@@ -237,7 +236,7 @@ export default function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] ml-1">Quantity/Pieces</label>
+                    <label>Quantity / Pieces</label>
                     <input
                       type="number"
                       placeholder="0"
@@ -247,7 +246,7 @@ export default function App() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] ml-1">Avg Unit Weight</label>
+                    <label>Average Weight</label>
                     <input
                       type="number"
                       placeholder="0.0"
@@ -297,21 +296,21 @@ export default function App() {
                           {entry.compartment}
                         </div>
                         <div>
-                          <p className="text-sm font-black text-white tracking-wide">ID: {entry.reference}</p>
-                          <p className="text-[10px] font-bold text-white/30 uppercase">
+                          <p className="text-xl font-black text-white tracking-wide">ID: {entry.reference}</p>
+                          <p className="text-sm font-bold text-white/50 uppercase">
                             {entry.pieces} pcs × {entry.avgWeight} kg
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-sm font-black text-white">{(entry.pieces * entry.avgWeight).toLocaleString()} <span className="text-[10px] text-white/30 uppercase">kg</span></p>
+                          <p className="text-xl font-black text-white">{(entry.pieces * entry.avgWeight).toLocaleString()} <span className="text-xs text-white/40 uppercase">kg</span></p>
                         </div>
                         <button
                           onClick={() => removeEntry(entry.id)}
-                          className="p-2 text-white/10 hover:text-rose-500 transition-colors"
+                          className="p-2 text-white/30 hover:text-rose-500 transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </motion.div>
@@ -333,20 +332,20 @@ export default function App() {
                   <Calculator size={200} />
                 </div>
                 <div className="relative z-10">
-                  <p className="text-sky-100/60 font-black text-[10px] uppercase tracking-[0.3em] mb-4">Total Cargo Load</p>
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <h2 className="text-6xl font-black tracking-tighter">{totalWeight.toLocaleString()}</h2>
-                    <span className="text-sky-200/60 font-bold uppercase text-xl">kg</span>
+                  <p className="text-white font-black text-[12px] uppercase tracking-[0.3em] mb-4">Total Cargo Load</p>
+                  <div className="flex items-baseline gap-2 mb-6 text-white">
+                    <h2 className="text-7xl font-black tracking-tighter">{totalWeight.toLocaleString()}</h2>
+                    <span className="font-bold uppercase text-2xl opacity-80">kg</span>
                   </div>
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-8">
                     <div>
-                      <p className="text-sky-100/40 text-[10px] font-black uppercase tracking-widest mb-1">Total Items</p>
-                      <p className="text-2xl font-black">{totalPieces.toLocaleString()} <span className="text-xs font-bold text-sky-100/40">PCS</span></p>
+                      <p className="text-white opacity-60 text-[11px] font-black uppercase tracking-widest mb-1">Total Items</p>
+                      <p className="text-3xl font-black text-white">{totalPieces.toLocaleString()} <span className="text-xs font-bold opacity-60">PCS</span></p>
                     </div>
-                    <div className="w-[1px] h-8 bg-white/10" />
+                    <div className="w-[1px] h-10 bg-white/20" />
                     <div>
-                      <p className="text-sky-100/40 text-[10px] font-black uppercase tracking-widest mb-1">Load Factor</p>
-                      <p className="text-2xl font-black">{entries.length} <span className="text-xs font-bold text-sky-100/40">SLOTS</span></p>
+                      <p className="text-white opacity-60 text-[11px] font-black uppercase tracking-widest mb-1">Load Factor</p>
+                      <p className="text-3xl font-black text-white">{entries.length} <span className="text-xs font-bold opacity-60">SLOTS</span></p>
                     </div>
                   </div>
                 </div>
@@ -370,19 +369,19 @@ export default function App() {
 
                 {[1, 2, 3, 4, 5].map(n => (
                   <div key={n} className="glass-card p-5 flex items-center justify-between overflow-hidden relative border-white/5 bg-white/[0.01]">
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div className={cn("text-3xl font-black opacity-10", (COMPARTMENT_COLORS[n] || '').split(' ').pop()?.replace('border-', 'text-'))}>{n}</div>
+                    <div className="flex items-center gap-6 relative z-10">
+                      <div className={cn("text-6xl font-black opacity-30 select-none", (COMPARTMENT_COLORS[n] || '').split(' ').pop()?.replace('border-', 'text-'))}>{n}</div>
                       <div>
-                        <p className="text-sm font-black text-white tracking-wide">Compartment {n}</p>
-                        <p className="text-[10px] font-bold text-white/30 uppercase">
+                        <p className="text-xl font-black text-white tracking-wide">Compartment {n}</p>
+                        <p className="text-xs font-bold text-white/40 uppercase mt-0.5">
                           {entries.filter(e => e.compartment === n).length} Items • {compartmentStats[n].pieces} pieces
                         </p>
                       </div>
                     </div>
                     <div className="text-right relative z-10">
-                      <p className="text-xl font-black text-white">
+                      <p className="text-2xl font-black text-white">
                         {compartmentStats[n].weight.toLocaleString()}
-                        <span className="text-[10px] text-white/30 uppercase ml-1">kg</span>
+                        <span className="text-xs text-white/40 uppercase ml-1">kg</span>
                       </p>
                     </div>
                     {/* Visual Progress Bar */}
