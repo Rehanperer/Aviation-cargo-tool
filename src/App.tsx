@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Plus,
   Trash2,
@@ -371,7 +371,7 @@ export default function App() {
                 {[1, 2, 3, 4, 5].map(n => (
                   <div key={n} className="glass-card p-5 flex items-center justify-between overflow-hidden relative border-white/5 bg-white/[0.01]">
                     <div className="flex items-center gap-4 relative z-10">
-                      <div className={cn("text-3xl font-black opacity-10", COMPARTMENT_COLORS[n].split(' ').pop().replace('border-', 'text-'))}>{n}</div>
+                      <div className={cn("text-3xl font-black opacity-10", (COMPARTMENT_COLORS[n] || '').split(' ').pop()?.replace('border-', 'text-'))}>{n}</div>
                       <div>
                         <p className="text-sm font-black text-white tracking-wide">Compartment {n}</p>
                         <p className="text-[10px] font-bold text-white/30 uppercase">
@@ -387,7 +387,7 @@ export default function App() {
                     </div>
                     {/* Visual Progress Bar */}
                     <div
-                      className={cn("absolute left-0 bottom-0 h-1 transition-all duration-1000", COMPARTMENT_SOLID_COLORS[n], "opacity-30")}
+                      className={cn("absolute left-0 bottom-0 h-1 transition-all duration-1000", COMPARTMENT_SOLID_COLORS[n] || '', "opacity-30")}
                       style={{ width: `${totalWeight > 0 ? (compartmentStats[n].weight / totalWeight) * 100 : 0}%` }}
                     />
                   </div>
