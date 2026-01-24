@@ -70,13 +70,31 @@ export default function App() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveForm, setSaveForm] = useState({ title: '', description: '' });
 
-  // Form State
   const [form, setForm] = useState({
     compartment: 1,
     reference: '',
     pieces: '',
     avgWeight: ''
   });
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener('appinstalled', () => setDeferredPrompt(null));
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setDeferredPrompt(null);
+  };
 
   useEffect(() => {
     localStorage.setItem('cargo-entries', JSON.stringify(entries));
@@ -180,12 +198,22 @@ export default function App() {
             </div>
             <h1 className="text-2xl font-black tracking-tight text-white">CargoWeigh</h1>
           </div>
-          <button
-            onClick={clearAll}
-            className="text-white/40 hover:text-rose-400 transition-colors text-xs font-bold uppercase tracking-widest"
-          >
-            Reset
-          </button>
+          <div className="flex items-center gap-3">
+            {deferredPrompt && (
+              <button
+                onClick={handleInstallClick}
+                className="bg-sky-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-sky-500/20 active:scale-95 transition-all uppercase tracking-widest"
+              >
+                Install App
+              </button>
+            )}
+            <button
+              onClick={clearAll}
+              className="text-white/40 hover:text-rose-400 transition-colors text-xs font-bold uppercase tracking-widest"
+            >
+              Reset
+            </button>
+          </div>
         </div>
         <div className="flex justify-between items-center">
           <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.2em]">Aviation Cargo Tool</p>
