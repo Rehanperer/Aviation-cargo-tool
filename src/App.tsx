@@ -197,7 +197,7 @@ export default function App() {
             <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center">
               <Calculator className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-white">CargoWeigh</h1>
+            <h1 className="text-2xl font-black tracking-tight text-white">QE CGO Weights</h1>
           </div>
           <div className="flex items-center gap-3">
             {!window.matchMedia('(display-mode: standalone)').matches && !(window.navigator as any).standalone && (
@@ -248,7 +248,7 @@ export default function App() {
               <div className="glass-card p-6 space-y-4 border-white/5 bg-white/[0.02]">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label>Compartment</label>
+                    <label>CPT</label>
                     <select
                       value={form.compartment}
                       onChange={e => setForm({ ...form, compartment: Number(e.target.value) })}
@@ -261,7 +261,7 @@ export default function App() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label>Reference ID</label>
+                    <label>ULD</label>
                     <input
                       type="text"
                       placeholder="Enter ID"
@@ -274,7 +274,7 @@ export default function App() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label>Quantity / Pieces</label>
+                    <label>NBR of PCS</label>
                     <input
                       type="number"
                       placeholder="0"
@@ -284,7 +284,7 @@ export default function App() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label>Average Weight</label>
+                    <label>AVG WT/PC</label>
                     <input
                       type="number"
                       placeholder="0.0"
@@ -410,7 +410,7 @@ export default function App() {
                     <div className="flex items-center gap-6 relative z-10">
                       <div className={cn("text-6xl font-black opacity-30 select-none", (COMPARTMENT_COLORS[n] || '').split(' ').pop()?.replace('border-', 'text-'))}>{n}</div>
                       <div>
-                        <p className="text-xl font-black text-white tracking-wide">Compartment {n}</p>
+                        <p className="text-xl font-black text-white tracking-wide">CPT {n}</p>
                         <p className="text-xs font-bold text-white/40 uppercase mt-0.5">
                           {entries.filter(e => e.compartment === n).length} Items • {compartmentStats[n].pieces} pieces
                         </p>
