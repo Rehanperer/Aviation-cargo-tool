@@ -79,7 +79,6 @@ export default function App() {
     avgWeight: '',
     totalWt: ''
   });
-  const [lastEdited, setLastEdited] = useState<'pieces' | 'avgWeight' | 'totalWt' | null>(null);
 
   // Auto-calculate the missing field whenever 2 of 3 are filled
   const handleFieldChange = (field: 'pieces' | 'avgWeight' | 'totalWt', value: string) => {
@@ -109,7 +108,6 @@ export default function App() {
       }
     }
 
-    setLastEdited(field);
     setForm(next);
   };
 
@@ -167,7 +165,6 @@ export default function App() {
 
     setEntries([...entries, newEntry]);
     setForm({ ...form, reference: '', pieces: '', avgWeight: '', totalWt: '' });
-    setLastEdited(null);
   };
 
   const removeEntry = (id: string) => {
