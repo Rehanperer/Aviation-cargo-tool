@@ -88,8 +88,6 @@ export default function App() {
     const a = Number(next.avgWeight);
     const t = Number(next.totalWt);
 
-    // Track which two were most recently user-edited
-    const edited = new Set([lastEdited, field].filter(Boolean));
 
     if (field === 'pieces') {
       if (next.avgWeight && p > 0) {
