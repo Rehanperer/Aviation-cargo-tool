@@ -28,6 +28,7 @@ interface CargoEntry {
   reference: string;
   pieces: number;
   avgWeight: number;
+  totalWeight: number;
 }
 
 interface SavedSession {
@@ -75,8 +76,44 @@ export default function App() {
     compartment: 1,
     reference: '',
     pieces: '',
-    avgWeight: ''
+    avgWeight: '',
+    totalWt: ''
   });
+  const [lastEdited, setLastEdited] = useState<'pieces' | 'avgWeight' | 'totalWt' | null>(null);
+
+  // Auto-calculate the missing field whenever 2 of 3 are filled
+  const handleFieldChange = (field: 'pieces' | 'avgWeight' | 'totalWt', value: string) => {
+    const next = { ...form, [field]: value };
+    const p = Number(next.pieces);
+    const a = Number(next.avgWeight);
+    const t = Number(next.totalWt);
+
+    // Track which two were most recently user-edited
+    const edited = new Set([lastEdited, field].filter(Boolean));
+
+    if (field === 'pieces') {
+      if (next.avgWeight && p > 0) {
+        next.totalWt = String(+(p * a).toFixed(2));
+      } else if (next.totalWt && p > 0) {
+        next.avgWeight = String(+(t / p).toFixed(2));
+      }
+    } else if (field === 'avgWeight') {
+      if (next.pieces && a > 0) {
+        next.totalWt = String(+(p * a).toFixed(2));
+      } else if (next.totalWt && a > 0) {
+        next.pieces = String(Math.round(t / a));
+      }
+    } else if (field === 'totalWt') {
+      if (next.pieces && p > 0) {
+        next.avgWeight = String(+(t / p).toFixed(2));
+      } else if (next.avgWeight && a > 0) {
+        next.pieces = String(Math.round(t / a));
+      }
+    }
+
+    setLastEdited(field);
+    setForm(next);
+  };
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
@@ -107,18 +144,32 @@ export default function App() {
 
   const addEntry = () => {
     if (entries.length >= 12) return alert('Maximum 12 entries reached');
-    if (!form.reference || !form.pieces || !form.avgWeight) return alert('Please fill all fields');
+    if (!form.reference) return alert('Please enter a reference ID');
+
+    const p = Number(form.pieces) || 0;
+    const a = Number(form.avgWeight) || 0;
+    const t = Number(form.totalWt) || 0;
+
+    // Need at least 2 of 3 to be non-zero
+    const filled = [p, a, t].filter(v => v > 0).length;
+    if (filled < 2) return alert('Fill at least 2 of: Pieces, Avg Weight, Total Weight');
+
+    const finalTotal = t > 0 ? t : p * a;
+    const finalPieces = p > 0 ? p : (a > 0 ? Math.round(finalTotal / a) : 0);
+    const finalAvg = a > 0 ? a : (p > 0 ? +(finalTotal / p).toFixed(2) : 0);
 
     const newEntry: CargoEntry = {
       id: crypto.randomUUID(),
       compartment: Number(form.compartment),
       reference: form.reference,
-      pieces: Number(form.pieces),
-      avgWeight: Number(form.avgWeight)
+      pieces: finalPieces,
+      avgWeight: finalAvg,
+      totalWeight: finalTotal
     };
 
     setEntries([...entries, newEntry]);
-    setForm({ ...form, reference: '', pieces: '', avgWeight: '' });
+    setForm({ ...form, reference: '', pieces: '', avgWeight: '', totalWt: '' });
+    setLastEdited(null);
   };
 
   const removeEntry = (id: string) => {
@@ -138,7 +189,7 @@ export default function App() {
       5: { weight: 0, pieces: 0 }
     };
     entries.forEach(e => {
-      stats[e.compartment].weight += e.pieces * e.avgWeight;
+      stats[e.compartment].weight += e.totalWeight ?? (e.pieces * e.avgWeight);
       stats[e.compartment].pieces += e.pieces;
     });
     return stats;
@@ -266,30 +317,40 @@ export default function App() {
                       type="text"
                       placeholder="Enter ID"
                       value={form.reference}
-                      onChange={e => setForm({ ...form, reference: e.target.value })}
-                      className="input-field bg-black/40 border-white/5"
+                      onChange={e => setForm({ ...form, reference: e.target.value.toUpperCase() })}
+                      className="input-field bg-black/40 border-white/5 uppercase"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <label>NBR of PCS</label>
+                    <label>PCS</label>
                     <input
                       type="number"
                       placeholder="0"
                       value={form.pieces}
-                      onChange={e => setForm({ ...form, pieces: e.target.value })}
+                      onChange={e => handleFieldChange('pieces', e.target.value)}
                       className="input-field bg-black/40 border-white/5"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label>AVG WT/PC</label>
+                    <label>AVG WT</label>
                     <input
                       type="number"
                       placeholder="0.0"
                       value={form.avgWeight}
-                      onChange={e => setForm({ ...form, avgWeight: e.target.value })}
+                      onChange={e => handleFieldChange('avgWeight', e.target.value)}
+                      className="input-field bg-black/40 border-white/5"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label>TOTAL WT</label>
+                    <input
+                      type="number"
+                      placeholder="0.0"
+                      value={form.totalWt}
+                      onChange={e => handleFieldChange('totalWt', e.target.value)}
                       className="input-field bg-black/40 border-white/5"
                     />
                   </div>
@@ -334,7 +395,7 @@ export default function App() {
                           {entry.compartment}
                         </div>
                         <div>
-                          <p className="text-xl font-black text-white tracking-wide">ID: {entry.reference}</p>
+                          <p className="text-xl font-black text-white tracking-wide uppercase">ID: {entry.reference}</p>
                           <p className="text-sm font-bold text-white/50 uppercase">
                             {entry.pieces} pcs × {entry.avgWeight} kg
                           </p>
@@ -342,7 +403,7 @@ export default function App() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-xl font-black text-white">{(entry.pieces * entry.avgWeight).toLocaleString()} <span className="text-xs text-white/40 uppercase">kg</span></p>
+                          <p className="text-xl font-black text-white">{(entry.totalWeight ?? (entry.pieces * entry.avgWeight)).toLocaleString()} <span className="text-xs text-white/40 uppercase">kg</span></p>
                         </div>
                         <button
                           onClick={() => removeEntry(entry.id)}
